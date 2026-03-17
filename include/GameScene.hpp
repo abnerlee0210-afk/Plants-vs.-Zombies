@@ -8,6 +8,7 @@
 #include "pch.hpp"
 
 #include "GameBoard.hpp"
+#include "SeedCard.hpp"
 
 #include "Projectile.hpp"
 #include "Pea.hpp"
@@ -38,10 +39,10 @@ private:
     };
 
     // 植物種類
-    enum class PlantType {
-        PEASHOOTER,
-        SUNFLOWER
-    };
+    //enum class PlantType {
+    //    PEASHOOTER,
+    //    SUNFLOWER
+    //};
 
 private:
     void HandleInput();
@@ -70,6 +71,9 @@ private:
     void UpdateSunflowers();
     void RemoveDeadSuns();
 
+    bool TrySelectSeedCardAtMousePosition();
+    void UpdateSeedCardSelectionVisual();
+
 private:
     GameBoard m_Board;
     Util::Renderer m_Renderer;
@@ -84,6 +88,8 @@ private:
     std::vector<std::shared_ptr<Zombie>> m_Zombies;
     std::vector<std::shared_ptr<Projectile>> m_Projectiles;
     std::vector<std::shared_ptr<Sun>> m_Suns;
+    std::vector<std::shared_ptr<SeedCard>> m_SeedCards;
+
 
     bool m_WasMousePressed = false;
 

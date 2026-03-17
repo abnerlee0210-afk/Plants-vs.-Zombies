@@ -42,6 +42,29 @@ GameScene::GameScene() {
     m_SunTextObject->m_Transform.translation = {-460.0f, 250.0f};
     m_Renderer.AddChild(m_SunTextObject);
 
+    // 卡片UI
+    auto peashooterCard = std::make_shared<SeedCard>(
+    RESOURCE_DIR "/card_peashooter.png",
+    PlantType::PEASHOOTER,
+    100,
+    glm::vec2(-580.0f, 250.0f)
+    );
+
+    auto sunflowerCard = std::make_shared<SeedCard>(
+        RESOURCE_DIR "/card_sunflower.png",
+        PlantType::SUNFLOWER,
+        50,
+        glm::vec2(-580.0f, 170.0f)
+    );
+
+    m_SeedCards.push_back(peashooterCard);
+    m_SeedCards.push_back(sunflowerCard);
+
+    m_Renderer.AddChild(peashooterCard);
+    m_Renderer.AddChild(sunflowerCard);
+
+    UpdateSeedCardSelectionVisual();
+
     m_LastSpawnTime = Util::Time::GetElapsedTimeMs() / 1000.0f;
 }
 
@@ -53,6 +76,7 @@ void GameScene::Update() {
 
     HandleInput();
 
+    // 植物類別Update
     for (auto& plant : m_Plants) {
         if (plant->IsAlive()) {
             plant->Update();
@@ -61,6 +85,7 @@ void GameScene::Update() {
 
     UpdateSunflowers();
 
+    // 生成殭屍
     TrySpawnZombie();
 
     UpdateZombiePlantInteractions();
@@ -84,20 +109,24 @@ void GameScene::HandleInput() {
     // 選擇植物 目前用NUM_*來決定種類，之後改成卡片UI
     if (Util::Input::IsKeyDown(Util::Keycode::NUM_1)) {
         m_SelectedPlantType = PlantType::PEASHOOTER;
+        UpdateSeedCardSelectionVisual();
     }
 
     if (Util::Input::IsKeyDown(Util::Keycode::NUM_2)) {
         m_SelectedPlantType = PlantType::SUNFLOWER;
+        UpdateSeedCardSelectionVisual();
     }
     // 防止連續觸發：利用 m_WasMousePressed 變數來記錄上一幀的狀態。
     // 這能確保玩家按住滑鼠時，只會觸發一次種植動作，而不是每秒噴出 60 顆植物。
     const bool isMousePressed = Util::Input::IsKeyDown(Util::Keycode::MOUSE_LB);
 
     if (isMousePressed && !m_WasMousePressed) {
-        // 優先收集Sun
-        if (!TryCollectSunAtMousePosition()) {
-        // 呼叫種植邏輯：當偵測到滑鼠左鍵按下，且上一幀沒按時，執行
-            TryPlantAtMousePosition();
+        if (!TrySelectSeedCardAtMousePosition()) {
+            // 優先收集Sun
+            if (!TryCollectSunAtMousePosition()) {
+                // 呼叫種植邏輯：當偵測到滑鼠左鍵按下，且上一幀沒按時，執行
+                TryPlantAtMousePosition();
+            }
         }
     }
 
@@ -484,4 +513,32 @@ void GameScene::RemoveDeadSuns() {
         ),
         m_Suns.end()
     );
+}
+
+bool GameScene::TrySelectSeedCardAtMousePosition() {
+    const glm::vec2 mousePos = Util::Input::GetCursorPosition();
+
+    for (auto& card : m_SeedCards) {
+        if (!card->ContainsPoint(mousePos)) {
+            continue;
+        }
+
+        m_SelectedPlantType = card->GetPlantType();
+        UpdateSeedCardSelectionVisual();
+
+        if (m_SelectedPlantType == PlantType::PEASHOOTER) {
+            LOG_DEBUG("Selected card => Peashooter");
+        } else if (m_SelectedPlantType == PlantType::SUNFLOWER) {
+            LOG_DEBUG("Selected card => Sunflower");
+        }
+        return true;
+    }
+
+    return false;
+}
+
+void GameScene::UpdateSeedCardSelectionVisual() {
+    for (auto& card : m_SeedCards) {
+        card->SetSelected(card->GetPlantType() == m_SelectedPlantType);
+    }
 }

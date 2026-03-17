@@ -55,6 +55,8 @@ add_executable(${PROJECT_NAME}
         src/Sunflower.cpp
         include/Sun.hpp
         src/Sun.cpp
+        include/SeedCard.hpp
+        src/SeedCard.cpp
 )
 
 if(MSVC)
