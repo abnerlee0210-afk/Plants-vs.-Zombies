@@ -21,6 +21,7 @@ public:
     SeedCard(const std::string& imagePath,
              PlantType plantType,
              int cost,
+             float cooldown,
              const glm::vec2& position);
 
     PlantType GetPlantType() const { return m_PlantType; }
@@ -31,10 +32,19 @@ public:
     void SetSelected(bool selected);
     bool IsSelected() const { return m_Selected; }
 
+    bool IsCoolingDown(float currentTime) const;
+    bool IsUsable(int currentSunPoints, float currentTime) const;
+    void TriggerCooldown(float currentTime);
+
+    float GetRemainingCooldown(float currentTime) const;
+
 private:
     PlantType m_PlantType;
     int m_Cost;
     bool m_Selected;
+
+    float m_Cooldown;
+    float m_LastUsedTime;
 
     float m_Width;
     float m_Height;

@@ -44,17 +44,24 @@ GameScene::GameScene() {
 
     // 卡片UI
     auto peashooterCard = std::make_shared<SeedCard>(
-    RESOURCE_DIR "/card_peashooter.png",
-    PlantType::PEASHOOTER,
-    100,
-    glm::vec2(-580.0f, 250.0f)
+        RESOURCE_DIR "/card_peashooter.png",
+        PlantType::PEASHOOTER,
+        100,
+        5.0f,
+        glm::vec2(-580.0f, 250.0f)
     );
 
     auto sunflowerCard = std::make_shared<SeedCard>(
         RESOURCE_DIR "/card_sunflower.png",
         PlantType::SUNFLOWER,
         50,
-        glm::vec2(-580.0f, 170.0f)
+        5.0f,
+        glm::vec2(-580.0f, 100.0f)
+    );
+
+    m_ShovelButton = std::make_shared<ShovelButton>(
+    RESOURCE_DIR "/shovel.png",
+    glm::vec2(-580.0f, -100.0f)
     );
 
     m_SeedCards.push_back(peashooterCard);
@@ -62,8 +69,10 @@ GameScene::GameScene() {
 
     m_Renderer.AddChild(peashooterCard);
     m_Renderer.AddChild(sunflowerCard);
-
     UpdateSeedCardSelectionVisual();
+
+    m_Renderer.AddChild(m_ShovelButton);
+    UpdateShovelVisual();
 
     m_LastSpawnTime = Util::Time::GetElapsedTimeMs() / 1000.0f;
 }
@@ -101,6 +110,7 @@ void GameScene::Update() {
     RemoveDeadSuns();
 
     CheckGameOver();
+    UpdateSeedCardUsabilityVisual();
 
     m_Renderer.Update();
 }
@@ -121,11 +131,13 @@ void GameScene::HandleInput() {
     const bool isMousePressed = Util::Input::IsKeyDown(Util::Keycode::MOUSE_LB);
 
     if (isMousePressed && !m_WasMousePressed) {
-        if (!TrySelectSeedCardAtMousePosition()) {
-            // 優先收集Sun
-            if (!TryCollectSunAtMousePosition()) {
-                // 呼叫種植邏輯：當偵測到滑鼠左鍵按下，且上一幀沒按時，執行
-                TryPlantAtMousePosition();
+        if (!TryToggleShovelAtMousePosition()) {
+            if (m_ShovelMode) {
+                TryRemovePlantAtMousePosition();
+            } else if (!TrySelectSeedCardAtMousePosition()) {
+                if (!TryCollectSunAtMousePosition()) {
+                    TryPlantAtMousePosition();
+                }
             }
         }
     }
@@ -164,7 +176,15 @@ void GameScene::TryPlantAtMousePosition() {
         plant = std::make_shared<Sunflower>(row, col, cellCenter);
     }
 
+    const float currentTime = Util::Time::GetElapsedTimeMs() / 1000.0f;
+    SeedCard* selectedCard = FindSeedCardByPlantType(m_SelectedPlantType);
+
     if (plant == nullptr) {
+        return;
+    }
+
+    if (!selectedCard->IsUsable(m_SunPoints, currentTime)) {
+        LOG_DEBUG("Card unavailable => cooling or insufficient sun");
         return;
     }
 
@@ -177,9 +197,14 @@ void GameScene::TryPlantAtMousePosition() {
     m_SunPoints -= plant->GetCost();
     UpdateSunText();
 
+    selectedCard->TriggerCooldown(currentTime);
+
     m_Plants.push_back(plant); // 存入一個 std::vector 或清單，方便後續統一管理（例如讓所有植物一起攻擊）。
     m_Board.PlacePlant(plant.get(), row, col); // m_Board：在棋盤陣列中標記該位置已有植物。
     m_Renderer.AddChild(plant);
+
+    UpdateSeedCardSelectionVisual();
+    UpdateSeedCardUsabilityVisual();
 
     LOG_DEBUG("Plant placed => row: {} col: {}", row, col);
 }
@@ -202,7 +227,7 @@ void GameScene::TrySpawnZombie() {
     m_Zombies.push_back(zombie);
     m_Renderer.AddChild(zombie);
 
-    LOG_DEBUG("Zombie spawned => row: {}", row);
+    // LOG_DEBUG("Zombie spawned => row: {}", row);
 }
 
 void GameScene::UpdateZombies() {
@@ -431,7 +456,7 @@ void GameScene::CheckGameOver() {
             EnterGameOver();                                //這個值你可能之後要依背景圖微調。
             return;
         }
-        LOG_DEBUG("Zombie x = {}", zombie->m_Transform.translation.x);
+        // LOG_DEBUG("Zombie x = {}", zombie->m_Transform.translation.x);
     }
 
 }
@@ -517,20 +542,28 @@ void GameScene::RemoveDeadSuns() {
 
 bool GameScene::TrySelectSeedCardAtMousePosition() {
     const glm::vec2 mousePos = Util::Input::GetCursorPosition();
+    const float currentTime = Util::Time::GetElapsedTimeMs() / 1000.0f;
 
     for (auto& card : m_SeedCards) {
         if (!card->ContainsPoint(mousePos)) {
             continue;
         }
 
+        if (!card->IsUsable(m_SunPoints, currentTime)) {
+            LOG_DEBUG("Card cannot be selected now");
+            return true;
+        }
+
         m_SelectedPlantType = card->GetPlantType();
         UpdateSeedCardSelectionVisual();
+        UpdateSeedCardUsabilityVisual();
 
         if (m_SelectedPlantType == PlantType::PEASHOOTER) {
             LOG_DEBUG("Selected card => Peashooter");
         } else if (m_SelectedPlantType == PlantType::SUNFLOWER) {
             LOG_DEBUG("Selected card => Sunflower");
         }
+
         return true;
     }
 
@@ -541,4 +574,101 @@ void GameScene::UpdateSeedCardSelectionVisual() {
     for (auto& card : m_SeedCards) {
         card->SetSelected(card->GetPlantType() == m_SelectedPlantType);
     }
+
+    UpdateSeedCardUsabilityVisual();
 }
+
+SeedCard* GameScene::FindSeedCardByPlantType(PlantType plantType) const {
+    for (const auto& card : m_SeedCards) {
+        if (card->GetPlantType() == plantType) {
+            return card.get();
+        }
+    }
+    return nullptr;
+}
+
+void GameScene::UpdateSeedCardUsabilityVisual() {
+    const float currentTime = Util::Time::GetElapsedTimeMs() / 1000.0f;
+
+    for (auto& card : m_SeedCards) {
+        const bool usable = card->IsUsable(m_SunPoints, currentTime);
+        const bool selected = (card->GetPlantType() == m_SelectedPlantType);
+
+        if (!usable) {
+            card->m_Transform.scale = {0.9f, 0.9f};
+        } else if (selected) {
+            card->m_Transform.scale = {1.1f, 1.1f};
+        } else {
+            card->m_Transform.scale = {1.0f, 1.0f};
+        }
+    }
+}
+
+
+bool GameScene::TryToggleShovelAtMousePosition() {
+    if (m_ShovelButton == nullptr) {
+        return false;
+    }
+
+    const glm::vec2 mousePos = Util::Input::GetCursorPosition();
+
+    if (!m_ShovelButton->ContainsPoint(mousePos)) {
+        return false;
+    }
+
+    m_ShovelMode = !m_ShovelMode;
+    UpdateShovelVisual();
+
+    if (m_ShovelMode) {
+        LOG_DEBUG("Shovel mode ON");
+    } else {
+        LOG_DEBUG("Shovel mode OFF");
+    }
+
+    return true;
+}
+
+
+void GameScene::UpdateShovelVisual() {
+    if (m_ShovelButton != nullptr) {
+        m_ShovelButton->SetSelected(m_ShovelMode);
+    }
+}
+
+
+void GameScene::TryRemovePlantAtMousePosition() {
+    const glm::vec2 mousePos = Util::Input::GetCursorPosition();
+
+    int row = -1;
+    int col = -1;
+
+    if (!m_Board.ScreenToGrid(mousePos.x, mousePos.y, row, col)) {
+        return;
+    }
+
+    Plant* targetPlant = m_Board.GetPlant(row, col);
+    if (targetPlant == nullptr) {
+        LOG_DEBUG("No plant to remove => row: {} col: {}", row, col);
+        return;
+    }
+
+    targetPlant->SetVisible(false);
+    m_Board.RemovePlant(row, col);
+
+    m_Plants.erase(
+        std::remove_if(
+            m_Plants.begin(),
+            m_Plants.end(),
+            [targetPlant](const std::shared_ptr<Plant>& plant) {
+                return plant.get() == targetPlant;
+            }
+        ),
+        m_Plants.end()
+    );
+
+    m_ShovelMode = false;
+    UpdateShovelVisual();
+
+    LOG_DEBUG("Plant removed => row: {} col: {}", row, col);
+}
+

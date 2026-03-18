@@ -9,6 +9,7 @@
 
 #include "GameBoard.hpp"
 #include "SeedCard.hpp"
+#include "ShovelButton.hpp"
 
 #include "Projectile.hpp"
 #include "Pea.hpp"
@@ -74,6 +75,13 @@ private:
     bool TrySelectSeedCardAtMousePosition();
     void UpdateSeedCardSelectionVisual();
 
+    SeedCard* FindSeedCardByPlantType(PlantType plantType) const;
+    void UpdateSeedCardUsabilityVisual();
+
+    bool TryToggleShovelAtMousePosition();
+    void UpdateShovelVisual();
+    void TryRemovePlantAtMousePosition();
+
 private:
     GameBoard m_Board;
     Util::Renderer m_Renderer;
@@ -81,8 +89,8 @@ private:
     std::shared_ptr<Util::GameObject> m_Background;
     std::shared_ptr<Util::GameObject> m_GameOverText;
     std::shared_ptr<Util::Text> m_SunText;
-    std::shared_ptr<Util::GameObject> m_SunTextObject; //因為 Renderer 是加 GameObject，不是直接加 Text。
-                                                        //所以建議補這個
+    std::shared_ptr<Util::GameObject> m_SunTextObject; //因為 Renderer 是加 GameObject，不是直接加 Text。所以建議補這個
+    std::shared_ptr<ShovelButton> m_ShovelButton;
 
     std::vector<std::shared_ptr<Plant>> m_Plants;
     std::vector<std::shared_ptr<Zombie>> m_Zombies;
@@ -92,6 +100,7 @@ private:
 
 
     bool m_WasMousePressed = false;
+    bool m_ShovelMode = false;
 
     float m_SpawnInterval = 3.0f;
     float m_LastSpawnTime = 0.0f;
