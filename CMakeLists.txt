@@ -63,6 +63,9 @@ add_executable(${PROJECT_NAME}
         src/LawnMower.cpp
         include/CherryBomb.hpp
         src/CherryBomb.cpp
+        include/LevelData.hpp
+        include/ConeheadZombie.hpp
+        src/ConeheadZombie.cpp
 )
 
 if(MSVC)
