@@ -37,7 +37,7 @@ void Sun::Update() {
     }
 
     const float deltaTime = Util::Time::GetDeltaTimeMs() / 1000.0f;
-    m_Transform.translation.y += m_FallSpeed * deltaTime;
+    m_Transform.translation.y -= m_FallSpeed * deltaTime;
 
     if (m_Transform.translation.y >= m_TargetPosition.y) {
         m_Transform.translation.y = m_TargetPosition.y;
