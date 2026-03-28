@@ -7,24 +7,24 @@
 
 #include "pch.hpp"
 
-#include "GameBoard.hpp"
-#include "SeedCard.hpp"
-#include "ShovelButton.hpp"
-#include "LawnMower.hpp"
-#include "LevelData.hpp"
+#include "Board//GameBoard.hpp"
+#include "UI/SeedCard.hpp"
+#include "UI/ShovelButton.hpp"
+#include "Entity/LawnMower.hpp"
+#include "Level/LevelData.hpp"
 
-#include "Projectile.hpp"
-#include "Pea.hpp"
-#include "Sun.hpp"
+#include "Entity/Projectile.hpp"
+#include "Entity/Pea.hpp"
+#include "Entity/Sun.hpp"
 
-#include "Plant.hpp"
-#include "Peashooter.hpp"
-#include "Sunflower.hpp"
-#include "CherryBomb.hpp"
+#include "Entity/Plant.hpp"
+#include "Entity/Peashooter.hpp"
+#include "Entity/Sunflower.hpp"
+#include "Entity/CherryBomb.hpp"
 
-#include "BasicZombie.hpp"
-#include "Zombie.hpp"
-#include "ConeheadZombie.hpp"
+#include "Entity/BasicZombie.hpp"
+#include "Entity/Zombie.hpp"
+#include "Entity/ConeheadZombie.hpp"
 
 
 #include "Util/GameObject.hpp"

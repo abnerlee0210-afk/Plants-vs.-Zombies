@@ -1,4 +1,4 @@
-#include "ShovelButton.hpp"
+#include "UI/ShovelButton.hpp"
 
 ShovelButton::ShovelButton(const std::string& imagePath, const glm::vec2& position)
     : Util::GameObject(std::make_shared<Util::Image>(imagePath), 35.0f),

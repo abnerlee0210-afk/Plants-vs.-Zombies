@@ -1,7 +1,7 @@
 //
 // Created by hankl on 2026/3/13.
 //
-#include "SeedCard.hpp"
+#include "UI/SeedCard.hpp"
 
 SeedCard::SeedCard(const std::string& imagePath,
                    PlantType plantType,

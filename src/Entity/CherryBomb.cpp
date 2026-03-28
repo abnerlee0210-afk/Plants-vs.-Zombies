@@ -1,4 +1,4 @@
-#include "CherryBomb.hpp"
+#include "Entity/CherryBomb.hpp"
 
 #include "Util/Time.hpp"
 

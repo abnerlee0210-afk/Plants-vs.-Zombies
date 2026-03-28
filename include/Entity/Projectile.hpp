@@ -5,10 +5,10 @@
 #ifndef PROJECTILE_HPP
 #define PROJECTILE_HPP
 
-#include "pch.hpp"
+#include "../../PTSD/include/pch.hpp"
 
-#include "Util/GameObject.hpp"
-#include "Util/Image.hpp"
+#include "../../PTSD/include/Util/GameObject.hpp"
+#include "../../PTSD/include/Util/Image.hpp"
 
 class Projectile : public Util::GameObject {
 public:

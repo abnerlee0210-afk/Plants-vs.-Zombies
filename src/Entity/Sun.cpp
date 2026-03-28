@@ -1,10 +1,11 @@
 //
 // Created by hankl on 2026/3/13.
 //
-#include "Sun.hpp"
+#include "Entity/Sun.hpp"
 
 #include "Util/Time.hpp"
 
+// 固定位置生成
 Sun::Sun(const glm::vec2& position, int value)
     : Util::GameObject(std::make_shared<Util::Image>(RESOURCE_DIR "/sun.png"), 12.0f),
       m_Value(value),
@@ -17,6 +18,7 @@ Sun::Sun(const glm::vec2& position, int value)
     m_Transform.translation = position;
 }
 
+// 掉落式生成
 Sun::Sun(const glm::vec2& startPosition, const glm::vec2& targetPosition, int value)
     : Util::GameObject(std::make_shared<Util::Image>(RESOURCE_DIR "/sun.png"), 12.0f),
       m_Value(value),
@@ -35,11 +37,13 @@ void Sun::Update() {
     if (!m_Alive || !m_IsFalling) {
         return;
     }
-
     const float deltaTime = Util::Time::GetDeltaTimeMs() / 1000.0f;
+    // 往下掉，所以 Y 要減掉速度
     m_Transform.translation.y -= m_FallSpeed * deltaTime;
 
-    if (m_Transform.translation.y >= m_TargetPosition.y) {
+    // 當目前的 Y 比目標還要「低」時，停止掉落
+    // 在中心 (0,0) 的坐標系，越下面數字越小 (例如 -100 比 200 小)
+    if (m_Transform.translation.y <= m_TargetPosition.y) {
         m_Transform.translation.y = m_TargetPosition.y;
         m_IsFalling = false;
     }

@@ -35,37 +35,37 @@ add_executable(${PROJECT_NAME}
     ${SRC_DIR}/main.cpp
     ${SRC_FILES}
     ${HEADER_FILES}
-        include/GameBoard.hpp
-        src/GameBoard.cpp
-        include/GameScene.hpp
-        src/GameScene.cpp
-        include/Plant.hpp
-        src/Plant.cpp
-        include/Peashooter.hpp
-        src/Peashooter.cpp
-        include/Zombie.hpp
-        src/Zombie.cpp
-        include/BasicZombie.hpp
-        src/BasicZombie.cpp
-        include/Projectile.hpp
-        src/Projectile.cpp
-        include/Pea.hpp
-        src/Pea.cpp
-        include/Sunflower.hpp
-        src/Sunflower.cpp
-        include/Sun.hpp
-        src/Sun.cpp
-        include/SeedCard.hpp
-        src/SeedCard.cpp
-        include/ShovelButton.hpp
-        src/ShovelButton.cpp
-        include/LawnMower.hpp
-        src/LawnMower.cpp
-        include/CherryBomb.hpp
-        src/CherryBomb.cpp
-        include/LevelData.hpp
-        include/ConeheadZombie.hpp
-        src/ConeheadZombie.cpp
+        include/Board/GameBoard.hpp
+        src/Board/GameBoard.cpp
+        include/Scene/GameScene.hpp
+        src/Scene/GameScene.cpp
+        include/Entity/Plant.hpp
+        src/Entity/Plant.cpp
+        include/Entity/Peashooter.hpp
+        src/Entity/Peashooter.cpp
+        include/Entity/Zombie.hpp
+        src/Entity/Zombie.cpp
+        include/Entity/BasicZombie.hpp
+        src/Entity/BasicZombie.cpp
+        include/Entity/Projectile.hpp
+        src/Entity/Projectile.cpp
+        include/Entity/Pea.hpp
+        src/Entity/Pea.cpp
+        include/Entity/Sunflower.hpp
+        src/Entity/Sunflower.cpp
+        include/Entity/Sun.hpp
+        src/Entity/Sun.cpp
+        include/UI/SeedCard.hpp
+        src/UI/SeedCard.cpp
+        include/UI/ShovelButton.hpp
+        src/UI/ShovelButton.cpp
+        include/Entity/LawnMower.hpp
+        src/Entity/LawnMower.cpp
+        include/Entity/CherryBomb.hpp
+        src/Entity/CherryBomb.cpp
+        include/Level/LevelData.hpp
+        include/Entity/ConeheadZombie.hpp
+        src/Entity/ConeheadZombie.cpp
 )
 
 if(MSVC)

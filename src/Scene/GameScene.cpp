@@ -1,7 +1,7 @@
 //
 // Created by hankl on 2026/3/10.
 //
-#include "GameScene.hpp"
+#include "Scene/GameScene.hpp"
 
 #include <algorithm>
 #include <cmath>
@@ -253,21 +253,6 @@ void GameScene::TriggerCherryBombDamage() {
 }
 
 void GameScene::HandleInput() {
-    // 選擇植物 目前用NUM_*來決定種類，之後改成卡片UI
-    if (Util::Input::IsKeyDown(Util::Keycode::NUM_1)) {
-        m_SelectedPlantType = PlantType::PEASHOOTER;
-        UpdateSeedCardSelectionVisual();
-    }
-
-    if (Util::Input::IsKeyDown(Util::Keycode::NUM_2)) {
-        m_SelectedPlantType = PlantType::SUNFLOWER;
-        UpdateSeedCardSelectionVisual();
-    }
-
-    if (Util::Input::IsKeyDown(Util::Keycode::NUM_3)) {
-        m_SelectedPlantType = PlantType::CHERRYBOMB;
-        UpdateSeedCardSelectionVisual();
-    }
     // 防止連續觸發：利用 m_WasMousePressed 變數來記錄上一幀的狀態。
     // 這能確保玩家按住滑鼠時，只會觸發一次種植動作，而不是每秒噴出 60 顆植物。
     const bool isMousePressed = Util::Input::IsKeyDown(Util::Keycode::MOUSE_LB);
@@ -1064,10 +1049,13 @@ void GameScene::UpdateSkySunSpawning() {
     m_LastSkySunSpawnTime = currentTime;
     m_NextSkySunInterval = 8.0f + static_cast<float>(rand() % 5);
 
-    float x = 260.0f + static_cast<float>(rand() % 700);
-    float targetY = 120.0f + static_cast<float>(rand() % 350);
+    // X 軸：從 -460 到 305 (涵蓋 9 欄)
+    float x = -460.0f + static_cast<float>(rand() % 765);
+    // 落地目標 Y 軸：從 -270 到 230 (涵蓋 5 列)
+    float targetY = -270.0f + static_cast<float>(rand() % 500);
 
-    glm::vec2 startPos{x, -50.0f};
+    // 出發點 Y 軸：設在螢幕上方邊緣外 (假設螢幕高度是 720，頂部約為 360)
+    glm::vec2 startPos{x, 400.0f};
     glm::vec2 targetPos{x, targetY};
 
     auto sun = std::make_shared<Sun>(startPos, targetPos, 25);

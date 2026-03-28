@@ -1,7 +1,7 @@
 //
 // Created by hankl on 2026/3/13.
 //
-#include "Sunflower.hpp"
+#include "Entity/Sunflower.hpp"
 
 Sunflower::Sunflower(int row, int col, const glm::vec2& position)
     : Plant(RESOURCE_DIR "/sunflower.png", row, col, position, 80, 50),

@@ -1,9 +1,9 @@
 //
 // Created by hankl on 2026/3/10.
 //
-#include "GameBoard.hpp"
+#include "Board/GameBoard.hpp"
 
-#include "Plant.hpp"
+#include "Entity/Plant.hpp"
 
 // 建構子與初始化 (Constructor)
 GameBoard::GameBoard()

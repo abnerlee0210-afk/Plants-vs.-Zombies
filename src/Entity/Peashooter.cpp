@@ -1,7 +1,7 @@
 //
 // Created by hankl on 2026/3/10.
 //
-#include "Peashooter.hpp"
+#include "Entity/Peashooter.hpp"
 
 Peashooter::Peashooter(int row, int col, const glm::vec2& position)
     : Plant(RESOURCE_DIR "/plant.png", row, col, position, 100, 100),

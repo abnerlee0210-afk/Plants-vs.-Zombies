@@ -1,7 +1,7 @@
 //
 // Created by hankl on 2026/3/10.
 //
-#include "Projectile.hpp"
+#include "Entity/Projectile.hpp"
 
 #include "Util/Time.hpp"
 

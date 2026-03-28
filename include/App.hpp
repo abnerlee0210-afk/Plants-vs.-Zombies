@@ -2,7 +2,7 @@
 #define APP_HPP
 
 #include "pch.hpp" // IWYU pragma: export
-#include "GameScene.hpp"
+#include "Scene/GameScene.hpp"
 
 class App {
 public:
